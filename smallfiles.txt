@@ -1,0 +1,39 @@
+package za.co.hadoop
+import java.text.SimpleDateFormat
+import org.apache.spark.sql.SparkSession
+import java.io._
+import org.apache.hadoop.fs.FileSystem
+
+
+/**
+  * Created by ABBN388 on 6/25/2018.
+  */
+object SmallFiles {
+  def main(args: Array[String]): Unit = {
+    val sparkSession = SparkSession.builder().appName("Combine Small Files").getOrCreate()
+    val sourceDirectory = args(0)
+    val outputDirectory = args(1)
+
+
+    System.out.print("Source directory : " + sourceDirectory)
+
+    val dataFrame = sparkSession.read.parquet(sourceDirectory + "/*.parquet")
+    val sourceCount =  dataFrame.count()
+
+    System.out.print("Number of records in original files : " + sourceCount + " ")
+
+    dataFrame.repartition(1).write.option("compression","snappy").parquet(outputDirectory)
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+}

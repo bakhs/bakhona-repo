@@ -1,0 +1,76 @@
+hadoop commands
+1. distributed copy
+nohup hadoop distcp -Ddfs.namenode.kerberos.principal.pattern=* -Dmapreduce.job.hdfs-servers.token-renewal.exclude=jhbpsr020000064.intranet.barcapint.com -skipcrccheck -update hdfs://hostname:port/<path-source> hdfs://hostname:port/bigdatahdfs/project//<path-dest> &
+
+hadoop distcp -D ipc.client.fallback-to-simple-auth-allowed=true hdfs://jhbpsr020000064.intranet.barcapint.com:8020/projects/* hdfs://jhbpsr020000143.intranet.barcapint.com:8020/projects/
+
+hadoop distcp -skipcrccheck -update 
+--------------
+2. Alter add partition
+alter table table-name add if not exists partition (year = 2018, month = 1, day = 25) LOCATION '/path-location';
+---------------
+3. beeline add data to hive
+beeline -u "${beeline_connect_string}" -n "${hive_user_name}" -p "${hive_password}" -hiveconf db_name=$db_name -hiveconf PROCESSING_DATE=$PROCESSING_DATE -hiveconf target_file_path=$target_file_path/reportDate=$PROCESSING_DATE -f "${hive_script_path}"
+---------------
+4. spark submit
+export SPARK_MAJOR_VERSION=2
+
+spark-submit --master yarn --queue llap --class com.absa.metis.importers.csv.ImportCSV /bigdata/datalake/cams/bin/metis_2.11-0.0.1-SNAPSHOT.jar -header:false -schemaLocation:file -delimiter:"|" -useManualSchema:/bigdata/datalake/cams/config/aps.json -sourceFile:/bigdatahdfs/landing/cams/aps/2018/05/10 -outputDirectory:/bigdatahdfs/datalake/publish/cams/aps/2018/05/1
+---------------
+5. ranger api
+
+curl -v -u 'username:password)' 'https://jhbpsr000001014.intranet.barcapint.com:6182/service/xusers/secure/groups' -H 'X-XSRF-HEADER: ""' -H 'Content-Type: application/json' -H 'X-Requested-With: XMLHttpRequest' --data-binary '{"name":"fGLBAFHDLZAARC","description":"Bigarch"}'
+
+Curl command to add policy : curl -iv -u "admin:ranger@adm1n" -H "Content-Type: application/json"  -X POST "http://jhbdsr020000016.intranet.barcapint.com:6080/service/public/v2/api/policy" -d @/home/ngwenyba_adm/hive.json
+----------------
+6. create hdfs encryption
+**Create key for each source system, run below command with hdfs user.
+  hadoop key create <source-name>
+**Create directory for each source system
+  hadoop fs –mkdir <directory-path>
+**Create Encryption Zone
+  hdfs crypto -createZone -keyName <source-name> -path <pathof the souce>
+**List crpto Zonesk
+  hdfs crypto -listZones
+-----------------
+7. users.allow file location
+/etc/opt/quest/vas/
+-----------------
+8. sentry for cloudera
+*****GRANT ROLE TO GROUP******
+CREATE ROLE role_name;
+GRANT ROLE role_name TO GROUP group
+SHOW GRANT ROLE role_name
+SHOW ROLE GRANT GROUP group_name
+REVOKE ROLE role_name [role_name] FROM GROUP 
+-----------------
+9. yarn commands
+***list application
+yarn application -list
+***kill application
+yarn application -kill
+------------------
+10. cloudera status
+***check cloudera status
+pbrun -h jhbpsr020000061 -u root service cloudera-scm-server status
+-------------------
+11. ambari-servers
+***ambari status
+ambari-server status
+-------------------
+12. streaming jar
+hadoop jar /usr/hdp/2.6.4.0-91/hadoop-mapreduce/hadoop-streaming.jar  -Dmapred.reduce.tasks=1  -input "/user/ngwenyba_adm/merge" \
+-output "/user/ngwenyba_adm/output" \
+-mapper cat \
+-reducer cat
+
+
+$ hadoop jar /usr/lib/hadoop-mapreduce/hadoop-streaming.jar \
+-D iow.streaming.output.schema=<your parquet schema> -files <your parquet schema>
+-D mapreduce.output.fileoutputformat.compress=true -D stream.reduce.output=text \
+-D parquet.compression=gzip -D parquet.enable.dictionary=true \
+-D parquet.write.support.class=net.iponweb.hadoop.streaming.parquet.GroupWriteSupport \
+-outputformat net.iponweb.hadoop.streaming.parquet.ParquetAsJsonOutputFormat \
+-input <your input> -output <your output> -mapper <your mapper> -reducer <your reducer>
+--------------------
+13. Unix commandsdu -a /home | sort -n -r | head -n 5
