@@ -101,3 +101,4 @@ Type ktutil
 - ktutil: addent -password -p  <your intranet id>@INTRANET.BARCAPINT.COM -k 1 -e RC4-HMAC
 - ktutil: wkt <your intranet id>.keytab
 - ktutil: q
+https://gist.github.com/treasuredhope
