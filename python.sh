@@ -39,9 +39,7 @@ def run_cmd(args_list):
         s_output, s_err = proc.communicate()
         s_return =  proc.returncode
         return s_return, s_output, s_err
-
-
-(ret, out, err)= run_cmd(['kinit', 'syshdfschew', '-kt', '/etc/security/keytabs/hdfs.headless.keytab'])
+(1,2,3)=run_cmd('commands')
 print "-----------------------------------------------------"
 
 
