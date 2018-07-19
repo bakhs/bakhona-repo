@@ -102,3 +102,8 @@ Type ktutil
 - ktutil: wkt <your intranet id>.keytab
 - ktutil: q
 https://gist.github.com/treasuredhope
+
+sync ldap
+/usr/sbin/ambari-server
+ambari-server user sync
+/etc/cron.daily/sync.sh
