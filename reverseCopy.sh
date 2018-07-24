@@ -1,11 +1,10 @@
 #!/bin/bash
-DBNAME=dl_prime2
-curdate=$(date "+%Y%m%d-%H%M%S")
-kinit sysafhdlafprm2 -kt /home/sysafhdlafprm2/sysafhdlafprm2.keytab
-active=` curl  -u infa:infa -k -sS -G  "https://jhbpsr020000101.intranet.barcapint.com:8443/api/v1/clusters/Galactic/host_components?HostRoles/component_name=NAMENODE&metrics/dfs/FSNamesystem/HAState=active"| grep 'host_name'`
+DBNAME=db
+
+active=` curl  -u infa:infa -k -sS -G  "https://host:port/api/v1/clusters/Galactic/host_components?HostRoles/component_name=NAMENODE&metrics/dfs/FSNamesystem/HAState=active"| grep 'host_name'`
 activehost=`echo $active | cut -d ":" -f 2  |  tr -d '"'`
 activehost="$(echo -e "${activehost}" | tr -d '[:space:]')"
-copycmd="hadoop distcp   -skipcrccheck   -update  webhdfs://${activehost}:50070/bigdatahdfs/datalake/publish/prm2 /bigdatahdfs/datalake/publish/prm2"
+copycmd="hadoop distcp   -skipcrccheck   -update  webhdfs://${activehost}:50070/path /path"
 echo "Command : $copycmd "
 $copycmd
 
@@ -16,11 +15,11 @@ else
 fi
 
 
-export DR_BEELINE_CONNECT_STRING="\"jdbc:hive2://jhbpsr000001017.intranet.barcapint.com:10000/$DBNAME;principal=hive/_HOST@INTRANET.BARCAPINT.COM\""
-export PROD_BEELINE_CONNECT_STRING="\"jdbc:hive2://jhbpsr020000142.intranet.barcapint.com:10000/$DBNAME;principal=hive/_HOST@INTRANET.BARCAPINT.COM\""
+export DR_BEELINE_CONNECT_STRING="\"jdbc:hive2://host:port/$DBNAME;principal=hive/_HOST@realm\""
+export PROD_BEELINE_CONNECT_STRING="\"jdbc:hive2://host:port/$DBNAME;principal=hive/_HOST@realm\""
 #hive --database  $DBNAME  -S  -e "show tables " > /tmp/$DBNAME_$curdate.txt
-tablenames="/home/sysafhdlafprm2/${DBNAME}_${curdate}.txt"
-countfile="/home/sysafhdlafprm2/count_${DBNAME}_${curdate}.log"
+tablenames="/home/path/${DBNAME}_${curdate}.txt"
+countfile="/home/path/count_${DBNAME}_${curdate}.log"
 beeline -u "${PROD_BEELINE_CONNECT_STRING}" -n hive -p hive  --silent=true  --showHeader=false --outputformat=csv2 -e "show tables" >>  ${tablenames}
 IFS=$'\n'       # make newtables the only separator
 set -f
@@ -51,4 +50,4 @@ for table in $(cat < "$tablenames");do
 
 done
 content=`cat ${countfile}` ; echo "$content"
-echo "$content}"  | mail -s "ReverseCopy status for Prime2 Source" BAGL_HADOOP_ADMIN@absa.co.za
+echo "$content}"  | mail -s "ReverseCopy status for source Source" email
