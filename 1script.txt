@@ -112,6 +112,10 @@ ambari-server user sync
 
 Curl command to add policy : curl -iv -u "admin:ranger@adm1n" -H "Content-Type: application/json"  -X POST "http://<ranger-host>:<port>/service/public/v2/api/policy" -d @<json-file-name>
 
-
+-----------------------
+zip
+tar –zcvf cif.tar.gz .
+tar –xzvf  cif.tar.gz
+-------------------------
 hive properties
 hive.security.authorization.sqlstd.confwhitelist.append
