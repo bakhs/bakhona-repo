@@ -119,3 +119,81 @@
 "isEnabled":true,
 "version":4
 }
+------------------------------------------
+
+#!/usr/bin/env python
+
+import sys
+import subprocess
+import datetime
+
+msg = "Must supply argument of createzones,createsnapshots,deleteOldsnapshots or snapshotdiff"
+
+if len(sys.argv) == 1:
+ print msg
+ exit()
+
+a = sys.argv[1]
+
+
+
+def run_cmd(args_list):
+        """
+        run linux commands
+        """
+        # import subprocess
+        print('Running system command: {0}'.format(' '.join(args_list)))
+        proc = subprocess.Popen(args_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        s_output, s_err = proc.communicate()
+        s_return =  proc.returncode
+        return s_return, s_output, s_err
+(ret, out, err)= run_cmd(['kinit', 'syshdfsjedi', '-kt', '/etc/security/keytabs/hdfs.headless.keytab'])
+(ret, out, err)= run_cmd(['hdfs', 'dfs', '-ls', '/bigdatahdfs/datalake/publish'])
+lines = out.split('\n')
+p = filter(lambda y: not y.endswith('za'),map(lambda x:"/" + x.split(' /')[1],lines[1:-1]))
+
+p.append('/bigdatahdfs/datalake/za/cib')
+
+p.append('/bigdatahdfs/datalake/za/lxx/cams')
+
+if a == 'createzones':
+
+ print "Commencing of " + a + " in Datalake Publish"
+
+ l = map(lambda y:run_cmd(['hdfs', 'dfsadmin', '-allowSnapshot', y]),p)
+
+elif a == 'createsnapshots':
+
+ dt = datetime.datetime.now().strftime("%Y-%m-%d")
+
+ print "Commencing of " + a + " in Datalake Publish for " + dt
+
+ l = map(lambda y:run_cmd(['hdfs', 'dfs', '-createSnapshot', y,"s" + dt]),p)
+
+elif a == 'deleteOldsnapshots':
+
+ dt = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+
+ print "Commencing of " + a + " in Datalake Publish for " + dt
+
+ l = map(lambda y:run_cmd(['hdfs', 'dfs', '-deleteSnapshot', y,"s" + dt]),p)
+
+elif a == 'snapshotdiff' and len(sys.argv) == 2:
+
+ dt_today = datetime.datetime.now().strftime("%Y-%m-%d")
+ dt_yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+ print "Commencing of " + a + " in Datalake Publish for all source system between today and yesterday"
+
+ l = map(lambda y:run_cmd(['hdfs', 'snapshotDiff', y,"s" + dt_today,"s" + dt_yesterday]),p)
+
+else:
+
+ print msg
+ exit()
+
+
+print "Complete"
+
+for f in l:
+ print f
