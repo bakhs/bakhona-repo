@@ -1,8 +1,8 @@
 hadoop commands
 1. distributed copy
-nohup hadoop distcp -Ddfs.namenode.kerberos.principal.pattern=* -Dmapreduce.job.hdfs-servers.token-renewal.exclude=jhbpsr020000064.intranet.barcapint.com -skipcrccheck -update hdfs://hostname:port/<path-source> hdfs://hostname:port/bigdatahdfs/project//<path-dest> &
+nohup hadoop distcp -Ddfs.namenode.kerberos.principal.pattern=* -Dmapreduce.job.hdfs-servers.token-renewal.exclude=host -skipcrccheck -update hdfs://hostname:port/<path-source> hdfs://hostname:port/bigdatahdfs/project//<path-dest> &
 
-hadoop distcp -D ipc.client.fallback-to-simple-auth-allowed=true hdfs://jhbpsr020000064.intranet.barcapint.com:8020/projects/* hdfs://jhbpsr020000143.intranet.barcapint.com:8020/projects/
+hadoop distcp -D ipc.client.fallback-to-simple-auth-allowed=true hdfs://host:portprojects/* hdfs://host:port/projects/
 
 hadoop distcp -skipcrccheck -update 
 --------------
